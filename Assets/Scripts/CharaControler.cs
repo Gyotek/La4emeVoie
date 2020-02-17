@@ -22,7 +22,7 @@ public class CharaControler : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        anim = GetComponent<Animator>();
+        anim = GetComponentInChildren<Animator>();
     }
 
     void Update()
@@ -42,14 +42,14 @@ public class CharaControler : MonoBehaviour
 
     void Move(float x)
     {
-        Vector3 movement = new Vector3(x * speed * Time.deltaTime * 1000, 0, 0);
-        Debug.Log(Physics.OverlapSphere(checkGround.position, 0.2f, groundLayers).Length);
+        Vector3 movement = new Vector3(x * speed * 1000 * Time.deltaTime, 0, 0);
+
         if (Input.GetButtonDown("Jump") && Physics.OverlapSphere(checkGround.position, 0.2f, groundLayers).Length != 0)
         {
             rb.AddForce(Vector3.up * jumpForce);
             anim.SetTrigger("jumpTrigger");
         }
-        else if (Physics.OverlapSphere(checkGround.position, 0.5f, groundLayers).Length != 0)
+        else if (!Input.GetButtonDown("Jump") && Physics.OverlapSphere(checkGround.position, 0.5f, groundLayers).Length != 0)
         {
             rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         }
@@ -57,7 +57,7 @@ public class CharaControler : MonoBehaviour
 
         rb.velocity = new Vector3(movement.x, rb.velocity.y + (Physics.gravity.y * gravityScale * Time.deltaTime), 0);
 
-        if (rb.velocity.x > 0.1f || rb.velocity.x < -0.1f) anim.SetBool("isWalking", true);
+        if ((rb.velocity.x > 0.2f || rb.velocity.x < -0.2f) && (rb.velocity.y < 0.2f || rb.velocity.y > -0.2f)) anim.SetBool("isWalking", true);
         else anim.SetBool("isWalking", false);
         if (rb.velocity.x < 0 && isFacingRight || rb.velocity.x > 0 && !isFacingRight) Flip();
     }
